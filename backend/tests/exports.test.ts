@@ -82,6 +82,24 @@ describe("Excel export endpoints", () => {
     expect(res.status).toBe(404);
   });
 
+  // Regression: unvalidated year/month params used to flow through as NaN, yielding an
+  // "undefined <year>" worksheet built over an invalid date range instead of a 400.
+  it("rejects a non-numeric month in a month export", async () => {
+    const { password } = await createUser({ username: "t1", password: "pass1234", role: "TREASURER" });
+    const token = await loginAs("t1", password);
+
+    const res = await request(app).get("/api/exports/month/2027/not-a-month").set("Authorization", `Bearer ${token}`);
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects an out-of-range month in a month export", async () => {
+    const { password } = await createUser({ username: "t1", password: "pass1234", role: "TREASURER" });
+    const token = await loginAs("t1", password);
+
+    const res = await request(app).get("/api/exports/month/2027/13").set("Authorization", `Bearer ${token}`);
+    expect(res.status).toBe(400);
+  });
+
   it("produces a valid (empty) workbook for a month with zero bills", async () => {
     const { password } = await createUser({ username: "t1", password: "pass1234", role: "TREASURER" });
     const token = await loginAs("t1", password);

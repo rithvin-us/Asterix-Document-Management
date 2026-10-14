@@ -29,7 +29,18 @@ export const exportSubsystem = asyncHandler(async (req: Request, res: Response) 
 });
 
 export const exportMonth = asyncHandler(async (req: Request, res: Response) => {
-  const key = `${req.params.year}-${String(req.params.month).padStart(2, "0")}`;
+  // Unvalidated params would reach generateMonthlyReportBuffer as NaN and produce an
+  // "undefined <year>" worksheet over an invalid date range instead of a clear 400.
+  const year = Number(req.params.year);
+  const month = Number(req.params.month);
+  if (!Number.isInteger(year) || year < 2000 || year > 2100) {
+    throw ApiError.badRequest("Invalid year: expected a four-digit year between 2000 and 2100");
+  }
+  if (!Number.isInteger(month) || month < 1 || month > 12) {
+    throw ApiError.badRequest("Invalid month: expected a number between 1 and 12");
+  }
+
+  const key = `${year}-${String(month).padStart(2, "0")}`;
   const { buffer } = await generateMonthlyReportBuffer(key);
   sendXlsx(res, `${key}-report.xlsx`, buffer);
 });

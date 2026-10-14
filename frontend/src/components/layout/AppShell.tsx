@@ -15,6 +15,7 @@ import {
   Users,
 } from "lucide-react";
 import { AiAssistantModal } from "../ui/AiAssistantModal";
+import type { Role } from "../../types";
 
 const MEMBER_NAV = [
   { to: "/", label: "Dashboard", shortLabel: "Home", icon: LayoutDashboard },
@@ -39,6 +40,12 @@ const ADMIN_NAV = [
   { to: "/reports", label: "Reports", shortLabel: "Reports", icon: FileBarChart2 },
   { to: "/analytics", label: "Analytics", shortLabel: "Stats", icon: BarChart3 },
 ];
+
+const ROLE_LABELS: Record<Role, string> = {
+  MEMBER: "Member",
+  TREASURER: "Treasurer",
+  ADMIN: "Admin",
+};
 
 export function AppShell() {
   const { user, logout } = useAuth();
@@ -98,7 +105,7 @@ export function AppShell() {
           <div className="flex flex-col gap-6 border-t border-line pt-4">
             <div>
               <p className="text-sm font-medium text-ink-900">{user?.displayName}</p>
-              <p className="text-xs text-ink-500">{user?.role === "TREASURER" ? "Treasurer" : "Member"}</p>
+              <p className="text-xs text-ink-500">{ROLE_LABELS[user?.role ?? "MEMBER"]}</p>
               <button
                 onClick={logout}
                 className="mt-3 flex items-center gap-1.5 text-sm font-medium text-ink-500 transition-colors hover:text-ink-900"

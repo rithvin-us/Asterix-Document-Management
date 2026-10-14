@@ -7,7 +7,7 @@ import { Subsystem } from "../src/models/Subsystem.js";
 import { Vendor } from "../src/models/Vendor.js";
 import { Report } from "../src/models/Report.js";
 
-let mongod: MongoMemoryServer;
+let mongod: MongoMemoryServer | undefined;
 
 beforeAll(async () => {
   mongod = await MongoMemoryServer.create();
@@ -26,5 +26,7 @@ afterEach(async () => {
 
 afterAll(async () => {
   await mongoose.disconnect();
-  await mongod.stop();
+  // Optional-chained: if beforeAll failed to start mongod, an unguarded .stop() throws a
+  // "Cannot read properties of undefined" teardown error that buries the real startup failure.
+  await mongod?.stop();
 });
