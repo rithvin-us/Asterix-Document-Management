@@ -2,7 +2,7 @@ import { User } from "../src/models/User.js";
 import { hashPassword } from "../src/services/authService.js";
 import { Subsystem } from "../src/models/Subsystem.js";
 
-export async function createUser(overrides: Partial<{ username: string; password: string; role: "MEMBER" | "TREASURER"; displayName: string }> = {}) {
+export async function createUser(overrides: Partial<{ username: string; password: string; role: "MEMBER" | "TREASURER" | "ADMIN"; displayName: string }> = {}) {
   const password = overrides.password ?? "password123";
   const user = await User.create({
     username: overrides.username ?? "member1",
